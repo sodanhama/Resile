@@ -13,6 +13,9 @@ const config = {
 
 let players
 let cursors
+let speed = 3
+
+let currentState
 
 function preload() {
     this.load.image("player", "./assets/player.png");
@@ -27,18 +30,36 @@ function create() {
 }
 
 function update() {
-    let speed = 3
-    const gravity = 0.5
-    if (cursors.left.isDown) {
-        player.x -= speed
-    } else if (cursors.right.isDown) {
-        player.x += speed
-    } 
-    if (cursors.space.isDown) {
-        player.y -= speed
+}
+
+const states = {
+    idle : {
+        onEnter() {
+            player.anims.stop();
+        },
+        onUpdate() {},
+        onExit() {}
+    },
+    "walk-left": {
+        onEnter() {},
+        onUpdate() {},
+        onExit() {}
+    },
+    "walk-right": {
+        onEnter() {},
+        onUpdate() {},
+        onExit() {}
+    },
+    "walk-up": {
+        onEnter() {},
+        onUpdate() {},
+        onExit() {}
+    },
+    "walk-down": {
+        onEnter() {},
+        onUpdate() {},
+        onExit() {}
     }
-    speed += gravity
-    player.y += speed
 }
 
 const game = new Phaser.Game(config);
