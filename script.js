@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 1450,
-    height: 810,
+    width: 1440,
+    height: 1100,
     backgroundColor: '#222',
     scene : {
         preload: preload,
@@ -9,26 +9,104 @@ const config = {
         update: update
     },
     pixelArt: true,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 30},
+        },
+        debug: true
+    }
 }
 
-let players
-let cursors
-let speed = 3
 
+let player
+let ground
+let cursors
+let speed = 1
 let currentState
+
+const states = {
+    idle : {
+        onEnter() {
+            player.anims.stop();
+            player.setFrame(0);
+        },
+        onUpdate() {
+            if (cursors.shift.isDown) {speed = 6;}
+            else {speed = 3;}
+            if (cursors.left.isDown) return "walk-left";
+            if (cursors.right.isDown) return "walk-right";
+            if (cursors.up.isDown) return "walk-up";
+            if (cursors.down.isDown) return "walk-down";
+            return "idle";
+        },
+        onExit() {}
+    },
+    "walk-left": {
+        onEnter() {
+            player.anims.play("walk-left", true);
+        },
+        onUpdate() {
+            if (!cursors.left.isDown) return "idle";
+            player.x -= speed;
+            return "walk-left";
+        },
+        onExit() {}
+    },
+    "walk-right": {
+        onEnter() {
+            player.anims.play("walk-right", true);
+        },
+        onUpdate() {
+            if (!cursors.right.isDown) return "idle";
+            player.x += speed;
+            return "walk-right";
+        },
+        onExit() {}
+    },
+    "walk-up": {
+        onEnter() {
+            player.anims.play("walk-up", true);
+        },
+        onUpdate() {
+            if (!cursors.up.isDown) return "idle";
+            player.y -= speed;
+            return "walk-up";
+        },
+        onExit() {}
+    },
+    "walk-down": {
+        onEnter() {
+            player.anims.play("walk-down", true);
+        },
+        onUpdate() {
+            if (!cursors.down.isDown) return "idle";
+            player.y += speed;
+            return "walk-down";
+        },
+        onExit() {}
+    }
+}
 
 function preload() {
     this.load.spritesheet("player", "./assets/player-spritesheet.png", {
-        frameWidth: 16,
-        frameHeight: 16
+        frameWidth: 160,
+        frameHeight: 160
     });
+
+    this.load.image("ground", "https://static.vecteezy.com/system/resources/thumbnails/026/691/275/small/beautiful-landscape-of-dry-grass-png.png");
 }
 
 function create() {
     const width = this.scale.width;
     const height = this.scale.height;
-    player = this.add.image(width / 2, height / 2, "player");
-    player.setScale(10);
+
+    ground = this.physics.add.staticGroup();
+
+    ground.create(400, 568, "ground").setScale(2).refreshBody();
+
+    player = this.physics.add.sprite(width / 2, height / 2, "player");
+
     cursors = this.input.keyboard.createCursorKeys();
 
     this.anims.create({
@@ -59,77 +137,17 @@ function create() {
         repeat: -1
     })
 
-    currentState = states.idle;
-    currentState.onEnter();
+    currentState = "idle";
+    states[currentState].onEnter();
 }
 
 function update() {
-    const nextState = currentState.onUpdate();
+    const nextState = states[currentState].onUpdate();
 
     if (nextState !== currentState) {
-        currentState.onExit();
-        currentState = states[nextState];
-        currentState.onEnter();
-    }
-}
-
-const states = {
-    idle : {
-        onEnter() {
-            player.anims.stop();
-        },
-        onUpdate() {
-            if (cursors.left.isDown) return "walk-left";
-            if (cursors.right.isDown) return "walk-right";
-            if (cursors.up.isDown) return "walk-up";
-            if (cursors.down.isDown) return "walk-down";
-            return "idle";
-        },
-        onExit() {}
-    },
-    "walk-left": {
-        onEnter() {
-            player.anims.play("walk-left", true);
-        },
-        onUpdate() {
-            if (!cursors.left.isDown) return "idle";
-            robot.x -= speed;
-            return "walk-left";
-        },
-        onExit() {}
-    },
-    "walk-right": {
-        onEnter() {
-            player.anims.play("walk-right", true);
-        },
-        onUpdate() {
-            if (!cursors.right.isDown) return "idle";
-            robot.x += speed;
-            return "walk-right";
-        },
-        onExit() {}
-    },
-    "walk-up": {
-        onEnter() {
-            player.anims.play("walk-up", true);
-        },
-        onUpdate() {
-            if (!cursors.up.isDown) return "idle";
-            robot.y -= speed;
-            return "walk-up";
-        },
-        onExit() {}
-    },
-    "walk-down": {
-        onEnter() {
-            player.anims.play("walk-down", true);
-        },
-        onUpdate() {
-            if (!cursors.down.isDown) return "idle";
-            robot.y += speed;
-            return "walk-down";
-        },
-        onExit() {}
+        states[currentState].onExit();
+        states[nextState].onEnter();
+        currentState = nextState;
     }
 }
 
