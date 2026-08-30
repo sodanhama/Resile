@@ -1,26 +1,17 @@
 const config = {
     type: Phaser.AUTO,
-    width: 1440,
-    height: 1100,
-    backgroundColor: '#222',
+    width: 1450,
+    height: 800,
+    backgroundColor: '#474056',
     scene : {
         preload: preload,
         create: create,
         update: update
     },
     pixelArt: true,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 30},
-        },
-        debug: true
-    }
 }
 
-
 let player
-let ground
 let cursors
 let speed = 1
 let currentState
@@ -93,19 +84,13 @@ function preload() {
         frameWidth: 160,
         frameHeight: 160
     });
-
-    this.load.image("ground", "https://static.vecteezy.com/system/resources/thumbnails/026/691/275/small/beautiful-landscape-of-dry-grass-png.png");
 }
 
 function create() {
     const width = this.scale.width;
     const height = this.scale.height;
 
-    ground = this.physics.add.staticGroup();
-
-    ground.create(400, 568, "ground").setScale(2).refreshBody();
-
-    player = this.physics.add.sprite(width / 2, height / 2, "player");
+    player = this.add.sprite(width / 2, height / 2, "player");
 
     cursors = this.input.keyboard.createCursorKeys();
 
