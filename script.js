@@ -1,8 +1,12 @@
 const config = {
     type: Phaser.AUTO,
-    width: 1450,
-    height: 800,
-    backgroundColor: '#474056',
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: '#333232',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     scene : {
         preload: preload,
         create: create,
@@ -12,6 +16,7 @@ const config = {
 }
 
 let player
+let ground
 let cursors
 let speed = 1
 let currentState
@@ -80,10 +85,12 @@ const states = {
 }
 
 function preload() {
-    this.load.spritesheet("player", "./assets/player-spritesheet.png", {
+    this.load.spritesheet("player", "./assets/playerspritesheet.png", {
         frameWidth: 160,
         frameHeight: 160
     });
+
+    this.load.image("ground", "./assets/ground.png");
 }
 
 function create() {
@@ -91,6 +98,8 @@ function create() {
     const height = this.scale.height;
 
     player = this.add.sprite(width / 2, height / 2, "player");
+
+    ground = this.add.image(0, 0, "ground").setOrigin(0, 0);
 
     cursors = this.input.keyboard.createCursorKeys();
 
