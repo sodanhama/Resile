@@ -2,7 +2,7 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
-    backgroundColor: '#333232',
+    backgroundColor: '#4F646F',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -16,8 +16,8 @@ const config = {
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: 20 },
-            debug: true
+            gravity: { y: 100 },
+            debug: false
         }
     }
 }
@@ -41,12 +41,12 @@ function create() {
     const width = this.scale.width;
     const height = this.scale.height;
 
-    player = this.physics.add.sprite(width / 2, height / 2, "player");
-
     ground = this.physics.add.staticGroup();
-
     ground.create(width / 2, height - 32, "ground").setScale(2).refreshBody();
-    
+
+    player = this.physics.add.sprite(width / 2, height / 2, "player").setScale(1.5);
+    player.body.setSize(player.width * 0.5, player.height * 0.7);
+
     this.physics.add.collider(player, ground);
 
     cursors = this.input.keyboard.createCursorKeys();
