@@ -45,8 +45,40 @@ const states = {
             player.anims.play("walk-left", true)
         },
         onUpdate() {
-            
-        }
+            if (!cursors.left.isDown) return "idle";
+            return "walk-left";
+        },
+        onExit() {}
+    },
+    "walk-right": {
+        onEnter() {
+            player.anims.play("walk-right", true)
+        },
+        onUpdate() {
+            if (!cursors.right.isDown) return "idle";
+            return "walk-right";
+        },
+        onExit() {}
+    },
+    "jump": {
+        onEnter() {
+            player.anims.play("jump", true)
+        },
+        onUpdate() {
+            if (player.body.velocity.y > 0) return "fall";
+            return "jump";
+        },
+        onExit() {}
+    },
+    "fall": {
+        onEnter() {
+            player.anims.play("fall", true)
+        },
+        onUpdate() {
+            if (player.body.touching.down) return "idle";
+            return "fall";
+        },
+        onExit() {}
     }
 }
 
@@ -88,6 +120,37 @@ function create() {
         trash.disableBody(true, true);
     })
 
+    this.anims.create({
+        key: "walk-left",
+        frames: this.anims.generateFrameNumbers("player", { start: 18, end: 23 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: "walk-right",
+        frames: this.anims.generateFrameNumbers("player", { start: 12, end: 17 }),
+        frameRate: 10,
+        repeat: -1
+    });    
+
+    this.anims.create({
+        key: "jump",
+        frames: this.anims.generateFrameNumbers("player", { start: 6, end: 11 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: "fall",
+        frames: this.anims.generateFrameNumbers("player", { start: 0, end: 5 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    currentState = "idle";
+    states[currentState].onEnter();
+
     cursors = this.input.keyboard.createCursorKeys();
 }
 
@@ -102,6 +165,14 @@ function update() {
         player.setVelocityX(160);
     } else {
         player.setVelocityX(0);
+    }
+
+    const nextState = states[currentState].onUpdate();
+
+    if (nextState !== currentState) {
+        states[currentState].onExit();
+        states[nextState].onEnter();
+        currentState = nextState;
     }
 }
 
