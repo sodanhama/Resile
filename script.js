@@ -45,8 +45,8 @@ function create() {
 
     ground = this.physics.add.staticGroup();
 
-    ground.create(height, 200, "ground").setScale(2).refreshBody();
-
+    ground.create(width / 2, height - 32, "ground").setScale(2).refreshBody();
+    
     this.physics.add.collider(player, ground);
 
     cursors = this.input.keyboard.createCursorKeys();
