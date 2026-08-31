@@ -24,9 +24,31 @@ const config = {
 
 let player
 let ground
+let score = 0
 let cursors
-let speed = 1
 
+const states = {
+    idle: {
+        onEnter() {
+            player.anims.stop();
+        },
+        onUpdate() {
+            if (cursors.left.isDown) return "walk-left";
+            if (cursors.right.isDown) return "walk-right";
+            if (cursors.space.isDown) return "jump";
+            return "idle";
+        },
+        onExit() {}
+    },
+    "walk-left": {
+        onEnter() {
+            player.anims.play("walk-left", true)
+        },
+        onUpdate() {
+            
+        }
+    }
+}
 
 function preload() {
     this.load.spritesheet("player", "./assets/playerspritesheet.png", {
@@ -37,6 +59,8 @@ function preload() {
     this.load.image("ground", "./assets/ground.png");
 
     this.load.image("platform", "./assets/platform.png");
+
+    this.load.image("trash", "./assets/trash.png");
 }
 
 function create() {
@@ -47,20 +71,29 @@ function create() {
     ground.create(width / 2, height - 32, "ground").setScale(2).refreshBody();
     
     platform = this.physics.add.staticGroup();
-    platform.create(500, 500, "platform").setScale(0.5).refreshBody();
+    platform.create(500, 600, "platform").setScale(0.5).refreshBody();
+
+    trash = this.physics.add.sprite(100, 100, "trash");
 
     player = this.physics.add.sprite(width / 2, 0, "player").setScale(1.25);
     player.body.setSize(player.width * 0.5, player.height * 0.7);
 
+
+    this.physics.add.collider(ground, trash)
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, platform);
+
+    this.physics.add.overlap(player, trash, () => {
+        score++;
+        trash.disableBody(true, true);
+    })
 
     cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
     if (cursors.space.isDown && player.body.touching.down) {
-        player.setVelocityY(-200);
+        player.setVelocityY(-300);
     }
 
     if (cursors.left.isDown) {
