@@ -24,8 +24,8 @@ const config = {
 
 let player
 let ground
-let score = 0
 let cursors
+let garbage = 5
 
 const states = {
     idle: {
@@ -103,22 +103,23 @@ function create() {
     ground.create(width / 2, height - 32, "ground").setScale(2).refreshBody();
     
     platform = this.physics.add.staticGroup();
-    platform.create(500, 600, "platform").setScale(0.5).refreshBody();
+    
+    platform.create(500, 200, "platform").setScale(0.5).refreshBody();
 
-    trash = this.physics.add.sprite(100, 100, "trash");
-
-    player = this.physics.add.sprite(width / 2, 0, "player").setScale(1.25);
+    player = this.physics.add.sprite(0, 0, "player").setScale(1);
     player.body.setSize(player.width * 0.5, player.height * 0.7);
 
+    trash = this.physics.add.group({
+        key: "trash",
+        repeat: garbage - 1,
+        setXY: { x: 500, y: 600, stepX: 100 }
+    });
+    
+    this.physics.add.collider(trash, ground);
 
-    this.physics.add.collider(ground, trash)
     this.physics.add.collider(player, ground);
     this.physics.add.collider(player, platform);
 
-    this.physics.add.overlap(player, trash, () => {
-        score++;
-        trash.disableBody(true, true);
-    })
 
     this.anims.create({
         key: "walk-left",
