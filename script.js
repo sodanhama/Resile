@@ -26,6 +26,7 @@ let player
 let ground
 let cursors
 let garbage = 5
+let score = 0
 
 const states = {
     idle: {
@@ -102,24 +103,32 @@ function create() {
     ground = this.physics.add.staticGroup();
     ground.create(width / 2, height - 32, "ground").setScale(2).refreshBody();
     
-    platform = this.physics.add.staticGroup();
-    
-    platform.create(500, 200, "platform").setScale(0.5).refreshBody();
+    platforms = this.physics.add.staticGroup({
+        key: "platform",
+        repeat: 3,
+        setXY: { x: 0, y: 200, stepX: 500, stepY: 240 },
+    });
 
     player = this.physics.add.sprite(0, 0, "player").setScale(1);
-    player.body.setSize(player.width * 0.5, player.height * 0.7);
+    player.body.setSize(player.width * 0.5, player.height * 0.5);
 
     trash = this.physics.add.group({
         key: "trash",
         repeat: garbage - 1,
-        setXY: { x: 500, y: 600, stepX: 100 }
+        setXY: { x: 50, y: 600, stepX: 310, stepY: -40 }
     });
-    
+
+    this.physics.add.overlap(player, trash, (player, trash) => {
+        trash.disableBody(true, true);
+        score += 1;
+        console.log(score)
+    });
+    for (platform of platforms.getChildren()) {
+        this.physics.add.collider(player, platform);
+        this.physics.add.collider(trash, platform);
+    }
     this.physics.add.collider(trash, ground);
-
     this.physics.add.collider(player, ground);
-    this.physics.add.collider(player, platform);
-
 
     this.anims.create({
         key: "walk-left",
@@ -156,6 +165,10 @@ function create() {
 }
 
 function update() {
+    if (score >= 5) {
+        window.alert("Congratulations! You have collected all the trash!");
+        game.AUTO.destroy(true);
+    }
     if (cursors.space.isDown && player.body.touching.down) {
         player.setVelocityY(-300);
     }
